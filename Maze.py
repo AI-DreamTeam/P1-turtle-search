@@ -177,7 +177,7 @@ def search_from(maze, start_row, start_column, tree):
         ListT.append(tree)
         print(tree.name)
         tree = tree.prev() # Regresa el puntero al nodo padre
-
+        search_from(maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
     # LEFT
     if maze[start_row][start_column - 1] == CLEAR:
         maze.update_position(start_row, start_column - 1, VISITED)
@@ -190,7 +190,7 @@ def search_from(maze, start_row, start_column, tree):
         ListT.append(tree)
         print(tree.name)
         tree = tree.prev()
-
+        search_from(maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
     # DOWN
     if maze[start_row + 1][start_column] == CLEAR:
         maze.update_position(start_row + 1, start_column, VISITED)
@@ -203,7 +203,7 @@ def search_from(maze, start_row, start_column, tree):
         ListT.append(tree)
         print(tree.name)
         tree = tree.prev()
-
+        search_from(maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
     # UP
     if maze[start_row - 1][start_column] == CLEAR:
         maze.update_position(start_row - 1, start_column, VISITED)
@@ -216,9 +216,7 @@ def search_from(maze, start_row, start_column, tree):
         ListT.append(tree)
         print(tree.name)
         tree = tree.prev()
-
-    tree = ListT[0] # Pone el puntero en el primer nodo del siguiente nivel
-    search_from(maze, ListQ[0], ListQ[1], tree) # Vuelve a comenzar la búsqueda por nivel
+        search_from(maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
 
 
 # Maze Creation
