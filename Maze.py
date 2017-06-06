@@ -23,6 +23,7 @@ maxDepth = [0]
 
 ADDED_DEPTH = 10
 
+Turtle = turtle.Turtle ();
 
 class Maze:
     def __init__(self, maze_file_name):
@@ -48,7 +49,7 @@ class Maze:
         self.columns_in_maze = columns_in_maze
         self.x_translate = - columns_in_maze / 2
         self.y_translate = rows_in_maze / 2
-        self.t = turtle.Turtle()
+        self.t = Turtle
         self.t.shape('turtle')
         self.wn = turtle.Screen()
         self.wn.setworldcoordinates(- (columns_in_maze - 1) / 2 - .5,
@@ -286,30 +287,30 @@ def isClear(position, maze):
     else:
         return False
 
-def moveLeft(position):
+def moveLeft(maze, position):
     newPos = (position[0], position[1] - 1);
     return newPos
 
-def moveRight(position):
+def moveRight(maze, position):
     newPos = (position[0], position[1] + 1);
     return newPos
 
-def moveUp(position):
+def moveUp(maze, position):
+    maze.t.setheading(maze.t.towards(0, 1000))
     newPos = (position[0] - 1, position[1]);
     return newPos
 
-def moveDown(position):
+def moveDown(maze, position):
+    maze.t.setheading(maze.t.towards(0, -1000))
     newPos = (position[0] + 1, position[1]);
     return newPos
 
 ###################################################################################################################################################3
-def search_depthFirst(startPos, currentDepth, maxDepth, maze, exitFound):
+def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
     algorithmCost[0] += 1 # Counter for the times the method is called
 
-    print('startPos: ' + str(startPos))
     print('currentDepth: ' + str(currentDepth))
-    print('maxDepth: ' + str(maxDepth))
-    print('exitFound: ' + str(exitFound))
+    print('currentCost: ' + str(algorithmCost[0]))
 
     maze.update_position(startPos[0], startPos[1], VISITED)
 
@@ -324,30 +325,30 @@ def search_depthFirst(startPos, currentDepth, maxDepth, maze, exitFound):
     if not exitFound:
         #LEFT
         print('Left?')
-        if(isClear(moveLeft(startPos), maze)):
+        if(isClear(moveLeft(maze, startPos), maze)):
             print('Moving Left')
-            exitFound = search_depthFirst(moveLeft(startPos), currentDepth + 1, maxDepth, maze, exitFound)
+            exitFound = search_depthFirst(moveLeft(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
 
     if not exitFound:
         #RIGHT
         print('Right?')
-        if(isClear(moveRight(startPos), maze)):
+        if(isClear(moveRight(maze, startPos), maze)):
             print('Moving Right')
-            exitFound = search_depthFirst(moveRight(startPos), currentDepth + 1, maxDepth, maze, exitFound)
+            exitFound = search_depthFirst(moveRight(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
 
     if not exitFound:
         #UP
         print('Up?')
-        if(isClear(moveUp(startPos), maze)):
+        if(isClear(moveUp(maze, startPos), maze)):
             print('Moving Up')
-            exitFound = search_depthFirst(moveUp(startPos), currentDepth + 1, maxDepth, maze, exitFound)
+            exitFound = search_depthFirst(moveUp(maze,startPos), currentDepth + 1, maxDepth, maze, exitFound)
 
     if not exitFound:
         #DOWN
         print('Down?')
-        if(isClear(moveDown(startPos), maze)):
+        if(isClear(moveDown(maze, startPos), maze)):
             print('Moving Down')
-            exitFound = search_depthFirst(moveDown(startPos), currentDepth + 1, maxDepth, maze, exitFound)
+            exitFound = search_depthFirst(moveDown(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
 
     if exitFound:
         return True
