@@ -24,6 +24,7 @@ maxDepth = [0]
 ADDED_DEPTH = 10
 
 Turtle = turtle.Turtle ();
+depth_reached = False
 
 class Maze:
     def __init__(self, maze_file_name):
@@ -110,8 +111,8 @@ class Maze:
 
 
     def update_position(self, row, col, val=None):
-        print('row: ' + str(row))
-        print('col: ' + str(col))
+        #print('row: ' + str(row))
+        #print('col: ' + str(col))
 
         if val:
             self.maze_list[row][col] = val
@@ -296,21 +297,18 @@ def moveRight(maze, position):
     return newPos
 
 def moveUp(maze, position):
-    maze.t.setheading(maze.t.towards(0, 1000))
     newPos = (position[0] - 1, position[1]);
     return newPos
 
 def moveDown(maze, position):
-    maze.t.setheading(maze.t.towards(0, -1000))
     newPos = (position[0] + 1, position[1]);
     return newPos
 
-###################################################################################################################################################3
+##################################################################################################################################################
 def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
-    algorithmCost[0] += 1 # Counter for the times the method is called
+    global depth_reached
 
-    print('currentDepth: ' + str(currentDepth))
-    print('currentCost: ' + str(algorithmCost[0]))
+    algorithmCost[0] += 1 # Counter for the times the method is called
 
     maze.update_position(startPos[0], startPos[1], VISITED)
 
@@ -319,9 +317,12 @@ def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
         Route.append(startPos[1])
         return True
     elif currentDepth >= maxDepth:
+        print ("Going back...");
+        depth_reached = True;
         return False
 
     #Check each child in the node, using depth-first
+    maze.t.setheading(maze.t.towards(-1000, 0))
     if not exitFound:
         #LEFT
         print('Left?')
@@ -329,6 +330,8 @@ def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
             print('Moving Left')
             exitFound = search_depthFirst(moveLeft(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
 
+    maze.update_position(startPos[0], startPos[1], VISITED)
+    maze.t.setheading(maze.t.towards(1000, 0))
     if not exitFound:
         #RIGHT
         print('Right?')
@@ -336,6 +339,8 @@ def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
             print('Moving Right')
             exitFound = search_depthFirst(moveRight(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
 
+    maze.update_position(startPos[0], startPos[1], VISITED)
+    maze.t.setheading(maze.t.towards(0, 1000))
     if not exitFound:
         #UP
         print('Up?')
@@ -343,6 +348,8 @@ def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
             print('Moving Up')
             exitFound = search_depthFirst(moveUp(maze,startPos), currentDepth + 1, maxDepth, maze, exitFound)
 
+    maze.update_position(startPos[0], startPos[1], VISITED)
+    maze.t.setheading(maze.t.towards(0, -1000))
     if not exitFound:
         #DOWN
         print('Down?')
@@ -350,8 +357,10 @@ def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
             print('Moving Down')
             exitFound = search_depthFirst(moveDown(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
 
+    maze.update_position(startPos[0], startPos[1], VISITED)
     if exitFound:
         return True
+
 
     return False # If program reaches this point, this depth limit does not lead to the exit
 
@@ -410,11 +419,14 @@ def solve_depthFirst(shouldIncrementMaxDepth, shouldDraw):
     return exitFound
 
 def main():
+    global depth_reached
     # solve_breathFirst()
     result = solve_depthFirst(False, True)
 
     while not result:
+        depth_reached = False
         result = solve_depthFirst(True, False)
+
 
 if __name__ == '__main__':
     main()
