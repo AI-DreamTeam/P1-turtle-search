@@ -21,6 +21,8 @@ Route = [] # Lista de coordenadas de la mejor ruta (salida a inicio)
 algorithmCost = [0]
 maxDepth = [0]
 
+ADDED_DEPTH = 10
+
 
 class Maze:
     def __init__(self, maze_file_name):
@@ -151,7 +153,7 @@ def BE_FREE(maze):
     while Route:
         row = Route.pop()
         col = Route.pop()
-        maze.update_position(row, col, PART_OF_PATH)
+        maze.update_position(col, row, PART_OF_PATH)
     while True:
         maze.t.right(90)
 
@@ -300,6 +302,7 @@ def moveDown(position):
     newPos = (position[0] + 1, position[1]);
     return newPos
 
+###################################################################################################################################################3
 def search_depthFirst(startPos, currentDepth, maxDepth, maze, exitFound):
     algorithmCost[0] += 1 # Counter for the times the method is called
 
@@ -391,7 +394,7 @@ def solve_depthFirst(shouldIncrementMaxDepth, shouldDraw):
     maxDepthValue = maxDepth[0]
 
     if shouldIncrementMaxDepth:
-        maxDepthValue += 10
+        maxDepthValue += ADDED_DEPTH
         maxDepth[0] = maxDepthValue
 
     exitFound = search_depthFirst(startPos, 0, maxDepthValue, my_maze, False)
