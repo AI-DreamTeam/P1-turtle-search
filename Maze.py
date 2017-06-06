@@ -9,6 +9,12 @@ DEAD_END = '-'
 VISITED = 'x'
 CLEAR = ' '
 
+COLOR_WALLS = "#99c2ff"
+COLOR_VISITED = "#FFCCCC"
+COLOR_FOUND = "#CCFFCC"
+
+RUN_SPEED = 3;
+
 class Maze:
     def __init__(self, maze_file_name):
         rows_in_maze = 0
@@ -45,33 +51,47 @@ class Maze:
     def draw_maze(self):
         self.t.speed(0)
         for y in range(self.rows_in_maze):
+            initial = -1
             for x in range(self.columns_in_maze):
-                if self.maze_list[y][x] == OBSTACLE:
-                    self.draw_centered_box(x + self.x_translate,
-                        - y + self.y_translate, 'orange')
+                if self.maze_list[y][x] == OBSTACLE and initial == -1:
+                    initial = x + self.x_translate
+                if self.maze_list[y][x] != OBSTACLE and initial != -1:
+                    self.draw_centered_box(initial, x + self.x_translate, - y + self.y_translate, COLOR_WALLS)
+                    initial = -1;
+            if initial != -1:
+                self.draw_centered_box(initial, self.columns_in_maze + self.x_translate, - y + self.y_translate, COLOR_WALLS)
+
         self.t.color('black')
         self.t.fillcolor('green')
-        self.t.speed(10)
+        self.t.speed(RUN_SPEED)
 
 
-    def draw_centered_box(self, x, y, color):
+    def draw_centered_box(self, xi, xf, y, color):
         self.t.up()
-        self.t.goto(x - .5, y - .5)
+        self.t.goto(xi - .5, y - .5)
         self.t.color(color)
         self.t.fillcolor(color)
         self.t.setheading(90)
         self.t.down()
         self.t.begin_fill()
-        for i in range(4):
-            self.t.forward(1)
-            self.t.right(90)
-        self.t.end_fill()
 
+        self.t.forward(1)
+        self.t.right(90)
+
+        self.t.forward(xf - xi)
+        self.t.right(90)
+
+        self.t.forward(1)
+        self.t.right(90)
+
+        self.t.forward(xf - xi)
+        self.t.right(90)
+
+        self.t.end_fill()
 
     def move_turtle(self, x, y):
         self.t.up()
-        self.t.setheading(self.t.towards(x + self.x_translate,
-                    - y + self.y_translate))
+        self.t.setheading(self.t.towards(x + self.x_translate, y + self.y_translate))
         self.t.goto(x + self.x_translate, - y + self.y_translate)
 
 
@@ -126,6 +146,8 @@ def BE_FREE(maze):
         row = Route.pop()
         col = Route.pop()
         maze.update_position(row, col, PART_OF_PATH)
+    while True:
+        maze.t.right(90)
 
 ## Cuando encuentra la salida, retrocede al inicio guardando las coordenadas
 ## por las que va pasando
@@ -144,7 +166,7 @@ def best_route(maze, start_row, start_column, tree):
     tree = tree.prev()
     best_route(maze, tree.row, tree.col, tree)
 
-## Busca por anchura (por niveles)
+## Busca por profundidad (por niveles)
 
 def search_from(maze, start_row, start_column, tree):
 
@@ -166,6 +188,7 @@ def search_from(maze, start_row, start_column, tree):
     del ListT[0]
 
     # RIGHT
+    maze.t.setheading(maze.t.towards(1000, 0))
     if maze[start_row][start_column + 1] == CLEAR:
         maze.update_position(start_row, start_column + 1, VISITED)
         ListQ.append(start_row)
@@ -177,8 +200,11 @@ def search_from(maze, start_row, start_column, tree):
         ListT.append(tree)
         print(tree.name)
         tree = tree.prev() # Regresa el puntero al nodo padre
-        search_from(maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
+        search_from (maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
     # LEFT
+
+    maze.update_position(start_row, start_column, VISITED)
+    maze.t.setheading(maze.t.towards(-1000, 0))
     if maze[start_row][start_column - 1] == CLEAR:
         maze.update_position(start_row, start_column - 1, VISITED)
         ListQ.append(start_row)
@@ -190,8 +216,11 @@ def search_from(maze, start_row, start_column, tree):
         ListT.append(tree)
         print(tree.name)
         tree = tree.prev()
-        search_from(maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
+        search_from (maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
     # DOWN
+
+    maze.update_position(start_row, start_column, VISITED)
+    maze.t.setheading(maze.t.towards(0, -1000))
     if maze[start_row + 1][start_column] == CLEAR:
         maze.update_position(start_row + 1, start_column, VISITED)
         ListQ.append(start_row + 1)
@@ -203,8 +232,11 @@ def search_from(maze, start_row, start_column, tree):
         ListT.append(tree)
         print(tree.name)
         tree = tree.prev()
-        search_from(maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
+        search_from (maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
     # UP
+
+    maze.update_position(start_row, start_column, VISITED)
+    maze.t.setheading(maze.t.towards(0, 1000))
     if maze[start_row - 1][start_column] == CLEAR:
         maze.update_position(start_row - 1, start_column, VISITED)
         ListQ.append(start_row - 1)
@@ -216,8 +248,8 @@ def search_from(maze, start_row, start_column, tree):
         ListT.append(tree)
         print(tree.name)
         tree = tree.prev()
-        search_from(maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
-
+        search_from (maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
+    maze.update_position(start_row, start_column, VISITED)
 
 # Maze Creation
 
