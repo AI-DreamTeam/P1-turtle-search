@@ -111,15 +111,12 @@ class Maze:
 
 
     def update_position(self, row, col, val=None):
-        print('row: ' + str(row))
-        print('col: ' + str(col))
-
         if val:
             self.maze_list[row][col] = val
         self.move_turtle(col, row)
 
         if val == PART_OF_PATH:
-            color = 'green'
+            color = '#ffad99'
         elif val == OBSTACLE:
             color = 'red'
         elif val == TRIED:
@@ -223,49 +220,41 @@ def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound, node):
         return False
 
     #Check each child in the node, using depth-first
-    #maze.t.setheading(maze.t.towards(-1000, 0))
+    maze.t.setheading(maze.t.towards(-1000, 0))
     if not exitFound:
         #LEFT
         algorithmCost[0] += 1
-        print('Left?')
         if(isClear(moveLeft(maze, startPos), maze)):
-            print('Moving Left')
             node = newNode(node, "Left", startPos[0], startPos[1] - 1)
             exitFound = search_depthFirst(moveLeft(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound, node)
             node = node.prev()
 
     maze.update_position(startPos[0], startPos[1], VISITED)
-    #maze.t.setheading(maze.t.towards(1000, 0))
+    maze.t.setheading(maze.t.towards(1000, 0))
     if not exitFound:
         #RIGHT
-        print('Right?')
         algorithmCost[0] += 1
         if(isClear(moveRight(maze, startPos), maze)):
-            print('Moving Right')
             node =  newNode(node, "Right", startPos[0], startPos[1] + 1)
             exitFound = search_depthFirst(moveRight(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound, node)
             node = node.prev()
 
     maze.update_position(startPos[0], startPos[1], VISITED)
-    #maze.t.setheading(maze.t.towards(0, 1000))
+    maze.t.setheading(maze.t.towards(0, 1000))
     if not exitFound:
         #UP
-        print('Up?')
         algorithmCost[0] += 1
         if(isClear(moveUp(maze, startPos), maze)):
-            print('Moving Up')
             node =  newNode(node, "Up", startPos[0] - 1, startPos[1])
             exitFound = search_depthFirst(moveUp(maze,startPos), currentDepth + 1, maxDepth, maze, exitFound, node)
             node = node.prev()
 
     maze.update_position(startPos[0], startPos[1], VISITED)
-    #maze.t.setheading(maze.t.towards(0, -1000))
+    maze.t.setheading(maze.t.towards(0, -1000))
     if not exitFound:
         #DOWN
-        print('Down?')
         algorithmCost[0] += 1
         if(isClear(moveDown(maze, startPos), maze)):
-            print('Moving Down')
             node = newNode(node, "Down", startPos[0] + 1, startPos[1])
             exitFound = search_depthFirst(moveDown(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound, node)
             node = node.prev()
