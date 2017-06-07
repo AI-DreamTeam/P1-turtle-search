@@ -13,7 +13,7 @@ COLOR_WALLS = "#99c2ff"
 COLOR_VISITED = "#FFCCCC"
 COLOR_FOUND = "#CCFFCC"
 
-RUN_SPEED = 3;
+RUN_SPEED = 10;
 
 ListQ = [] # Lista de coordenadas visitadas
 ListT = [] # Lista de nodos
@@ -21,7 +21,7 @@ Route = [] # Lista de coordenadas de la mejor ruta (salida a inicio)
 algorithmCost = [0]
 maxDepth = [0]
 
-ADDED_DEPTH = 10
+ADDED_DEPTH = 50
 
 Turtle = turtle.Turtle ();
 depth_reached = False
@@ -111,8 +111,8 @@ class Maze:
 
 
     def update_position(self, row, col, val=None):
-        #print('row: ' + str(row))
-        #print('col: ' + str(col))
+        print('row: ' + str(row))
+        print('col: ' + str(col))
 
         if val:
             self.maze_list[row][col] = val
@@ -155,7 +155,9 @@ def BE_FREE(maze):
     while Route:
         row = Route.pop()
         col = Route.pop()
-        maze.update_position(col, row, PART_OF_PATH)
+        maze.update_position(row, col, PART_OF_PATH)
+
+    print('algorithmCost: ' + str(algorithmCost[0]))
     while True:
         maze.t.right(90)
 
@@ -163,9 +165,8 @@ def BE_FREE(maze):
 ## por las que va pasando
 
 def best_route(maze, start_row, start_column, tree):
-
     #maze.update_position(start_row, start_column, PART_OF_PATH)
-    #print(tree.name)
+    print(tree.name)
     if tree.name == "start":
         Route.append(start_column)
         Route.append(start_row)
@@ -175,112 +176,6 @@ def best_route(maze, start_row, start_column, tree):
     Route.append(start_row)
     tree = tree.prev()
     best_route(maze, tree.row, tree.col, tree)
-
-## Busca por profundidad (por niveles)
-
-def search_from_breathFirst(maze, start_row, start_column, tree):
-    # print('row,column: ' + str(start_row) + ',' + str(start_column))
-    ## Verifica si es una salida
-    if maze.is_exit(start_row, start_column):
-        print("is exit")
-        maze.update_position(start_row, start_column, "exit")
-        best_route(maze, start_row, start_column, tree)
-        # input("PRESS ENTER TO CONTINUE.")
-        return True
-
-    ## Sino checa los vecinos del nodo
-    Vrow=start_row
-    Vcol=start_column
-    Tval=ListT[0]
-
-    del ListQ[0]
-    del ListQ[0]
-
-    del ListT[0]
-
-    # RIGHT
-    maze.t.setheading(maze.t.towards(1000, 0))
-
-    # print('maze[{}][{}] == CLEAR?'.format(start_row, start_column + 1, CLEAR))
-    if maze[start_row][start_column + 1] == CLEAR:
-        maze.update_position(start_row, start_column + 1, VISITED)
-        ListQ.append(start_row)
-        ListQ.append(start_column + 1)
-        tree = tree.add()  # se crea un nuevo nodo que se liga al padre
-        tree.name = "RIGHT"
-        tree.row = start_row
-        tree.col = start_column + 1
-        ListT.append(tree)
-        print(tree.name)
-        tree = tree.prev() # Regresa el puntero al nodo padre
-
-        search_from (maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
-    # LEFT
-
-    maze.update_position(start_row, start_column, VISITED)
-    maze.t.setheading(maze.t.towards(-1000, 0))
-        # input("PRESS ENTER TO CONTINUE.")
-
-    # LEFT
-    # print('maze[{}][{}] == CLEAR?'.format(start_row, start_column - 1))
-    if maze[start_row][start_column - 1] == CLEAR:
-        maze.update_position(start_row, start_column - 1, VISITED)
-        ListQ.append(start_row)
-        ListQ.append(start_column - 1)
-        tree = tree.add()  # add a node to the parent
-        tree.name = "LEFT"  # name it
-        tree.row = start_row
-        tree.col = start_column - 1
-        ListT.append(tree)
-        print(tree.name)
-        tree = tree.prev()
-        search_from (maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
-    # DOWN
-
-    maze.update_position(start_row, start_column, VISITED)
-    maze.t.setheading(maze.t.towards(0, -1000))
-        # input("PRESS ENTER TO CONTINUE.")
-
-    # DOWN
-    # print('maze[{}][{}] == CLEAR?'.format(start_row + 1, start_column))
-    if maze[start_row + 1][start_column] == CLEAR:
-        maze.update_position(start_row + 1, start_column, VISITED)
-        ListQ.append(start_row + 1)
-        ListQ.append(start_column)
-        tree = tree.add()  # add a node to the parent
-        tree.name = "DOWN"  # name it
-        tree.row = start_row + 1
-        tree.col = start_column
-        ListT.append(tree)
-        print(tree.name)
-        tree = tree.prev()
-        search_from (maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
-    # UP
-
-    maze.update_position(start_row, start_column, VISITED)
-    maze.t.setheading(maze.t.towards(0, 1000))
-        # input("PRESS ENTER TO CONTINUE.")
-
-    # UP
-    # print('maze[{}][{}] == CLEAR?'.format(start_row - 1, start_column))
-    if maze[start_row - 1][start_column] == CLEAR:
-        maze.update_position(start_row - 1, start_column, VISITED)
-        ListQ.append(start_row - 1)
-        ListQ.append(start_column)
-        tree = tree.add()  # add a node to the parent
-        tree.name = "UP"  # name it
-        tree.row = start_row - 1
-        tree.col = start_column
-        ListT.append(tree)
-        print(tree.name)
-        tree = tree.prev()
-        search_from (maze, ListQ[0], ListQ[1], ListT[0]) # Vuelve a comenzar la búsqueda por nivel
-    maze.update_position(start_row, start_column, VISITED)
-        # input("PRESS ENTER TO CONTINUE.")
-
-    tree = ListT[0] # Pone el puntero en el primer nodo del siguiente nivel
-    search_from_breathFirst(maze, ListQ[0], ListQ[1], tree) # Vuelve a comenzar la búsqueda por nivel
-
 
 def isClear(position, maze):
     if maze[position[0]][position[1]] == CLEAR:
@@ -304,17 +199,23 @@ def moveDown(maze, position):
     newPos = (position[0] + 1, position[1]);
     return newPos
 
-##################################################################################################################################################
-def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
-    global depth_reached
+def newNode (node, name, row, col):
+    new_node = node.add()
+    new_node.name = name
+    new_node.row = row
+    new_node.col = col
+    ListT.append(new_node)
+    return new_node
 
-    algorithmCost[0] += 1 # Counter for the times the method is called
+##################################################################################################################################################
+def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound, node):
+    global depth_reached
+    algorithmCost[0] += 1
 
     maze.update_position(startPos[0], startPos[1], VISITED)
 
     if maze.is_exit(startPos[0], startPos[1]):
-        Route.append(startPos[0])
-        Route.append(startPos[1])
+        best_route(maze, startPos[0], startPos[1], node);
         return True
     elif currentDepth >= maxDepth:
         print ("Going back...");
@@ -322,40 +223,52 @@ def search_depthFirst (startPos, currentDepth, maxDepth, maze, exitFound):
         return False
 
     #Check each child in the node, using depth-first
-    maze.t.setheading(maze.t.towards(-1000, 0))
+    #maze.t.setheading(maze.t.towards(-1000, 0))
     if not exitFound:
         #LEFT
+        algorithmCost[0] += 1
         print('Left?')
         if(isClear(moveLeft(maze, startPos), maze)):
             print('Moving Left')
-            exitFound = search_depthFirst(moveLeft(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
+            node = newNode(node, "Left", startPos[0], startPos[1] - 1)
+            exitFound = search_depthFirst(moveLeft(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound, node)
+            node = node.prev()
 
     maze.update_position(startPos[0], startPos[1], VISITED)
-    maze.t.setheading(maze.t.towards(1000, 0))
+    #maze.t.setheading(maze.t.towards(1000, 0))
     if not exitFound:
         #RIGHT
         print('Right?')
+        algorithmCost[0] += 1
         if(isClear(moveRight(maze, startPos), maze)):
             print('Moving Right')
-            exitFound = search_depthFirst(moveRight(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
+            node =  newNode(node, "Right", startPos[0], startPos[1] + 1)
+            exitFound = search_depthFirst(moveRight(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound, node)
+            node = node.prev()
 
     maze.update_position(startPos[0], startPos[1], VISITED)
-    maze.t.setheading(maze.t.towards(0, 1000))
+    #maze.t.setheading(maze.t.towards(0, 1000))
     if not exitFound:
         #UP
         print('Up?')
+        algorithmCost[0] += 1
         if(isClear(moveUp(maze, startPos), maze)):
             print('Moving Up')
-            exitFound = search_depthFirst(moveUp(maze,startPos), currentDepth + 1, maxDepth, maze, exitFound)
+            node =  newNode(node, "Up", startPos[0] - 1, startPos[1])
+            exitFound = search_depthFirst(moveUp(maze,startPos), currentDepth + 1, maxDepth, maze, exitFound, node)
+            node = node.prev()
 
     maze.update_position(startPos[0], startPos[1], VISITED)
-    maze.t.setheading(maze.t.towards(0, -1000))
+    #maze.t.setheading(maze.t.towards(0, -1000))
     if not exitFound:
         #DOWN
         print('Down?')
+        algorithmCost[0] += 1
         if(isClear(moveDown(maze, startPos), maze)):
             print('Moving Down')
-            exitFound = search_depthFirst(moveDown(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound)
+            node = newNode(node, "Down", startPos[0] + 1, startPos[1])
+            exitFound = search_depthFirst(moveDown(maze, startPos), currentDepth + 1, maxDepth, maze, exitFound, node)
+            node = node.prev()
 
     maze.update_position(startPos[0], startPos[1], VISITED)
     if exitFound:
@@ -407,7 +320,7 @@ def solve_depthFirst(shouldIncrementMaxDepth, shouldDraw):
         maxDepthValue += ADDED_DEPTH
         maxDepth[0] = maxDepthValue
 
-    exitFound = search_depthFirst(startPos, 0, maxDepthValue, my_maze, False)
+    exitFound = search_depthFirst (startPos, 0, maxDepthValue, my_maze, False, tree)
 
     if exitFound:
         BE_FREE(my_maze)
